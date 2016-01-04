@@ -5,6 +5,7 @@
          xmlns="http://java.sun.com/xml/ns/javaee"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
     <servlet>
         <servlet-name>api</servlet-name>
         <servlet-class>org.glassfish.jersey.servlet.ServletContainer</servlet-class>
@@ -14,8 +15,24 @@
         </init-param>
         <load-on-startup>1</load-on-startup>
     </servlet>
+
     <servlet-mapping>
         <servlet-name>api</servlet-name>
         <url-pattern>/api/*</url-pattern>
     </servlet-mapping>
+
+    <filter>
+        <filter-name>guiceFilter</filter-name>
+        <filter-class>com.google.inject.servlet.GuiceFilter</filter-class>
+    </filter>
+
+    <filter-mapping>
+        <filter-name>guiceFilter</filter-name>
+        <url-pattern>/*</url-pattern>
+    </filter-mapping>
+
+    <listener>
+        <listener-class>net.thetranquilpsychonaut.ServletConfig</listener-class>
+    </listener>
+
 </web-app>
