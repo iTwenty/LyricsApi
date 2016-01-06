@@ -1,15 +1,14 @@
 package net.thetranquilpsychonaut.apis
 
-import com.google.inject.Inject
 import net.thetranquilpsychonaut.config.KeyProps
-import org.glassfish.jersey.server.ClientBinding
+import net.thetranquilpsychonaut.models.GetLyricsRequestItem
+import net.thetranquilpsychonaut.models.acoustid.GetLyricsResponseItem
+import javax.inject.Inject
 import javax.ws.rs.*
 import javax.ws.rs.client.ClientBuilder
 import javax.ws.rs.client.Entity
-import javax.ws.rs.client.WebTarget
 import javax.ws.rs.core.Form
 import javax.ws.rs.core.MediaType
-import kotlin.collections.forEach
 
 @Path("lyrics")
 class LyricsApi {
@@ -26,17 +25,18 @@ class LyricsApi {
     @Produces(MediaType.APPLICATION_JSON)
     fun getLyrics(
             @FormParam("duration") duration: Long,
-            @FormParam("fingerprint") fingerprint: String): String {
+            @FormParam("fingerprint") fingerprint: String): GetLyricsResponseItem {
 
+        val requestItem = GetLyricsRequestItem(duration, fingerprint)
         val client = ClientBuilder.newClient()
         val target = client.target("http://api.acoustid.org/v2/lookup")
         val form = Form()
-        form.param("duration", duration.toString())
-        form.param("fingerprint", fingerprint)
+        form.param("duration", requestItem.duration.toString())
+        form.param("fingerprint", requestItem.fingerprint)
         form.param("client", mKeyProps.getAcoustidApiKey())
-        form.asMap().forEach { entry -> print("${entry.key} -> ${entry.value}") }
+        val entity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED)
         val response = target.request(MediaType.APPLICATION_JSON)
-        .post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED), String::class.java)
+                .post(entity, GetLyricsResponseItem::class.java)
         return response
     }
 }
